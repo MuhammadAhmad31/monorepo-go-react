@@ -1,0 +1,75 @@
+# contracts/schemas/product.yaml
+Product:
+  type: object
+  required:
+    - id
+    - name
+    - price
+    - stock
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+      description: Product UUID
+    name:
+      type: string
+      example: "Product Name"
+      minLength: 2
+      maxLength: 255
+      description: Product name
+    description:
+      type: string
+      nullable: true
+      example: "Product description"
+      description: Product description
+    price:
+      type: number
+      format: double
+      example: 99.99
+      description: Product price
+    stock:
+      type: integer
+      example: 100
+      description: Stock quantity
+    category:
+      type: string
+      nullable: true
+      example: "Electronics"
+      description: Product category
+    created_at:
+      type: string
+      format: date-time
+      description: Creation timestamp
+    updated_at:
+      type: string
+      format: date-time
+      description: Last update timestamp
+
+CreateProductRequest:
+  type: object
+  required:
+    - name
+    - price
+    - stock
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 255
+      example: "Product Name"
+    description:
+      type: string
+      nullable: true
+      example: "Product description"
+    price:
+      type: number
+      format: double
+      example: 99.99
+    stock:
+      type: integer
+      example: 100
+    category:
+      type: string
+      nullable: true
+      example: "Electronics"

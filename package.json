@@ -1,0 +1,43 @@
+{
+  "name": "go-react-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo with Golang backend and React frontend",
+  "scripts": {
+    "help": "echo '\n📦 Available Commands:\n\nSetup:\n  npm run install:all\n  npm run generate\n\nDevelopment:\n  npm run dev          - Run BE + FE concurrently\n  npm run dev:be       - Run backend only\n  npm run dev:fe       - Run frontend only\n\nDocs:\n  npm run docs         - Open Swagger UI (Docker)\n\nGenerate:\n  npm run generate     - Generate from OpenAPI\n  npm run generate:be  - Generate backend\n  npm run generate:fe  - Generate frontend\n  npm run bundle       - Bundle split OpenAPI files\n\nBuild:\n  npm run build\n  npm run build:be\n  npm run build:fe\n\nTest:\n  npm run test\n'",
+
+    "install:all": "npm run install:be && npm run install:fe",
+    "install:be": "cd backend && go mod download && go mod tidy",
+    "install:fe": "cd frontend && npm install",
+
+    "bundle": "npx swagger-cli bundle contracts/openapi.yaml --outfile contracts/openapi.bundled.yaml --type yaml",
+
+    "docs": "npm run docs:api & npm run docs:code",
+    "docs:api": "npm run bundle && docker run --rm -p 8081:8080 -e SWAGGER_JSON=/docs/openapi.bundled.yaml -v $(pwd)/contracts:/docs swaggerapi/swagger-ui",
+    "docs:code": "cd docs && npm run start",
+
+    "generate": "npm run bundle && npm run generate:be && npm run generate:fe",
+    "generate:be": "cd backend && go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -config oapi-codegen.yaml ../contracts/openapi.bundled.yaml && go run cmd/tools/generate-rbac/main.go ../contracts/openapi.bundled.yaml internal/generated/rbac.go",
+    "generate:fe": "cd frontend && npm run generate",
+
+    "dev": "npx concurrently -n BE,FE -c blue,green \"npm run dev:be\" \"npm run dev:fe\"",
+    "dev:be": "cd backend && go run cmd/main.go",
+    "dev:fe": "cd frontend && npm run dev",
+
+    "build": "npm run build:be && npm run build:fe",
+    "build:be": "cd backend && go build -o ../dist/api cmd/main.go",
+    "build:fe": "cd frontend && npm run build",
+
+    "test": "npm run test:be && npm run test:fe",
+    "test:be": "cd backend && go test ./... -v",
+    "test:fe": "cd frontend && npm run test",
+
+    "clean": "rm -rf backend/internal/generated frontend/src/generated frontend/dist dist contracts/openapi.bundled.yaml",
+
+    "fmt": "cd backend && go fmt ./... && cd ../frontend && npm run format",
+    "lint": "cd backend && go vet ./... && cd ../frontend && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

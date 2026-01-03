@@ -1,0 +1,788 @@
+openapi: 3.0.3
+info:
+  title: Backend API
+  description: RESTful API with authentication
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+servers:
+  - url: 'http://localhost:8080/api/v1'
+    description: Development server
+  - url: 'https://api.example.com/v1'
+    description: Production server
+tags:
+  - name: auth
+    description: Authentication endpoints
+  - name: users
+    description: User management
+  - name: products
+    description: Product management
+paths:
+  /auth/register:
+    post:
+      operationId: register
+      summary: Register new user
+      description: Create a new user account with email and password
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              name: John Doe
+              email: john@example.com
+              password: password123
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                user:
+                  id: 123e4567-e89b-12d3-a456-426614174000
+                  name: John Doe
+                  email: john@example.com
+                  role: user
+                  is_active: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /auth/login:
+    post:
+      operationId: login
+      summary: Login user
+      description: Authenticate user and return JWT token
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: john@example.com
+              password: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                user:
+                  id: 123e4567-e89b-12d3-a456-426614174000
+                  name: John Doe
+                  email: john@example.com
+                  role: user
+                  is_active: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get current user
+      description: Get current authenticated user information
+      tags:
+        - auth
+      security:
+        - BearerAuth:
+            - user
+            - admin
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+              example:
+                user_id: 123e4567-e89b-12d3-a456-426614174000
+                email: john@example.com
+                role: user
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users:
+    get:
+      operationId: listUsers
+      summary: Get all users
+      description: Retrieve a paginated list of users
+      tags:
+        - users
+      security:
+        - BearerAuth:
+            - admin
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createUser
+      summary: Create new user
+      description: Create a new user (admin only)
+      tags:
+        - users
+      security:
+        - BearerAuth:
+            - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/users/{id}':
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      description: Retrieve a specific user by UUID
+      tags:
+        - users
+      security:
+        - BearerAuth:
+            - admin
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: updateUser
+      summary: Update user
+      description: Update an existing user
+      tags:
+        - users
+      security:
+        - BearerAuth:
+            - admin
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteUser
+      summary: Delete user
+      description: Delete a user
+      tags:
+        - users
+      security:
+        - BearerAuth:
+            - admin
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '204':
+          description: User deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /products:
+    get:
+      operationId: listProducts
+      summary: Get all products
+      description: Retrieve a paginated list of products
+      tags:
+        - products
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createProduct
+      summary: Create new product
+      description: Create a new product
+      tags:
+        - products
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/products/{id}':
+    get:
+      operationId: getProduct
+      summary: Get product by ID
+      description: Retrieve a specific product by UUID
+      tags:
+        - products
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: updateProduct
+      summary: Update product
+      description: Update an existing product
+      tags:
+        - products
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteProduct
+      summary: Delete product
+      description: Delete a product
+      tags:
+        - products
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '204':
+          description: Product deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number
+    PerPageParam:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+      description: Items per page
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+      example: 123e4567-e89b-12d3-a456-426614174000
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Invalid input
+            code: BAD_REQUEST
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Authentication required
+            code: UNAUTHORIZED
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Resource not found
+            code: NOT_FOUND
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Access denied
+            code: FORBIDDEN
+    Conflict:
+      description: Conflict - Resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Email already registered
+            code: CONFLICT
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Internal server error
+            code: INTERNAL_ERROR
+  schemas:
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Invalid input
+        code:
+          type: string
+          example: INVALID_INPUT
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    Meta:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+    PaginationParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        per_page:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: John Doe
+          description: Full name of the user
+        email:
+          type: string
+          format: email
+          example: john@example.com
+          description: Valid email address
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: password123
+          description: Password (minimum 6 characters)
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+          description: User email address
+        password:
+          type: string
+          format: password
+          example: password123
+          description: User password
+    AuthResponse:
+      type: object
+      required:
+        - token
+        - user
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          description: JWT authentication token
+        user:
+          $ref: '#/components/schemas/UserData'
+    UserData:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - role
+        - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: User UUID
+        name:
+          type: string
+          example: John Doe
+          description: User's full name
+        email:
+          type: string
+          format: email
+          example: john@example.com
+          description: User's email address
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - guest
+          example: user
+          description: User role
+        is_active:
+          type: boolean
+          example: true
+          description: Whether the user account is active
+    MeResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: Current user UUID
+        email:
+          type: string
+          format: email
+          example: john@example.com
+          description: Current user email
+        role:
+          type: string
+          example: user
+          description: Current user role
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: User UUID
+        name:
+          type: string
+          example: John Doe
+          minLength: 2
+          maxLength: 100
+          description: User's full name
+        email:
+          type: string
+          format: email
+          example: john@example.com
+          description: User's email address
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - guest
+          default: user
+          description: User role
+        is_active:
+          type: boolean
+          default: true
+          description: Whether the user is active
+        created_at:
+          type: string
+          format: date-time
+          description: User creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: User last update timestamp
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: password123
+          description: User password (will be hashed)
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - guest
+          default: user
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 6
+          description: 'New password (optional, will be hashed)'
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - guest
+        is_active:
+          type: boolean
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - stock
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: Product UUID
+        name:
+          type: string
+          example: Product Name
+          minLength: 2
+          maxLength: 255
+          description: Product name
+        description:
+          type: string
+          nullable: true
+          example: Product description
+          description: Product description
+        price:
+          type: number
+          format: double
+          example: 99.99
+          description: Product price
+        stock:
+          type: integer
+          example: 100
+          description: Stock quantity
+        category:
+          type: string
+          nullable: true
+          example: Electronics
+          description: Product category
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - stock
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 255
+          example: Product Name
+        description:
+          type: string
+          nullable: true
+          example: Product description
+        price:
+          type: number
+          format: double
+          example: 99.99
+        stock:
+          type: integer
+          example: 100
+        category:
+          type: string
+          nullable: true
+          example: Electronics
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key

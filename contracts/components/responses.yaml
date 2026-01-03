@@ -1,0 +1,59 @@
+BadRequest:
+  description: Bad request
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Invalid input"
+        code: "BAD_REQUEST"
+
+NotFound:
+  description: Resource not found
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Resource not found"
+        code: "NOT_FOUND"
+
+Unauthorized:
+  description: Unauthorized
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Authentication required"
+        code: "UNAUTHORIZED"
+
+Forbidden:
+  description: Forbidden
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Access denied"
+        code: "FORBIDDEN"
+
+Conflict:
+  description: Conflict - Resource already exists
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Email already registered"
+        code: "CONFLICT"
+
+InternalServerError:
+  description: Internal server error
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/Error'
+      example:
+        message: "Internal server error"
+        code: "INTERNAL_ERROR"

@@ -1,0 +1,94 @@
+# contracts/paths/auth.yaml
+auth_register:
+  post:
+    operationId: register
+    summary: Register new user
+    description: Create a new user account with email and password
+    tags:
+      - auth
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/auth.yaml#/RegisterRequest'
+          example:
+            name: "John Doe"
+            email: "john@example.com"
+            password: "password123"
+    responses:
+      '201':
+        description: User registered successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/AuthResponse'
+            example:
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              user:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "John Doe"
+                email: "john@example.com"
+                role: "user"
+                is_active: true
+      '400':
+        $ref: '../components/responses.yaml#/BadRequest'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
+
+auth_login:
+  post:
+    operationId: login
+    summary: Login user
+    description: Authenticate user and return JWT token
+    tags:
+      - auth
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/auth.yaml#/LoginRequest'
+          example:
+            email: "john@example.com"
+            password: "password123"
+    responses:
+      '200':
+        description: Login successful
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/AuthResponse'
+            example:
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              user:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "John Doe"
+                email: "john@example.com"
+                role: "user"
+                is_active: true
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+
+auth_me:
+  get:
+    operationId: getCurrentUser
+    summary: Get current user
+    description: Get current authenticated user information
+    tags:
+      - auth
+    security:
+      - BearerAuth: [user, admin]
+    responses:
+      '200':
+        description: Current user information
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/auth.yaml#/MeResponse'
+            example:
+              user_id: "123e4567-e89b-12d3-a456-426614174000"
+              email: "john@example.com"
+              role: "user"
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'

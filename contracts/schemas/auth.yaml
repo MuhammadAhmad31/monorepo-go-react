@@ -1,0 +1,105 @@
+RegisterRequest:
+  type: object
+  required:
+    - name
+    - email
+    - password
+  properties:
+    name:
+      type: string
+      minLength: 3
+      maxLength: 100
+      example: "John Doe"
+      description: Full name of the user
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+      description: Valid email address
+    password:
+      type: string
+      format: password
+      minLength: 6
+      example: "password123"
+      description: Password (minimum 6 characters)
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+      description: User email address
+    password:
+      type: string
+      format: password
+      example: "password123"
+      description: User password
+
+AuthResponse:
+  type: object
+  required:
+    - token
+    - user
+  properties:
+    token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      description: JWT authentication token
+    user:
+      $ref: '#/UserData'
+
+UserData:
+  type: object
+  required:
+    - id
+    - name
+    - email
+    - role
+    - is_active
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+      description: User UUID
+    name:
+      type: string
+      example: "John Doe"
+      description: User's full name
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+      description: User's email address
+    role:
+      type: string
+      enum: [admin, user, guest]
+      example: "user"
+      description: User role
+    is_active:
+      type: boolean
+      example: true
+      description: Whether the user account is active
+
+MeResponse:
+  type: object
+  properties:
+    user_id:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+      description: Current user UUID
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+      description: Current user email
+    role:
+      type: string
+      example: "user"
+      description: Current user role

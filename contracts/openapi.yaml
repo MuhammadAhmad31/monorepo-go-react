@@ -1,0 +1,108 @@
+# contracts/openapi.yaml
+openapi: 3.0.3
+info:
+  title: Backend API
+  description: RESTful API with authentication
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+  - url: https://api.example.com/v1
+    description: Production server
+
+tags:
+  - name: auth
+    description: Authentication endpoints
+  - name: users
+    description: User management
+  - name: products
+    description: Product management
+
+paths:
+  /auth/register:
+    $ref: './paths/auth.yaml#/auth_register'
+  
+  /auth/login:
+    $ref: './paths/auth.yaml#/auth_login'
+  
+  /auth/me:
+    $ref: './paths/auth.yaml#/auth_me'
+
+  /users:
+    $ref: './paths/users.yaml#/users'
+  
+  /users/{id}:
+    $ref: './paths/users.yaml#/users_by_id'
+
+  /products:
+    $ref: './paths/products.yaml#/products'
+  
+  /products/{id}:
+    $ref: './paths/products.yaml#/products_by_id'
+
+components:
+  parameters:
+    PageParam:
+      $ref: './components/parameters.yaml#/PageParam'
+    PerPageParam:
+      $ref: './components/parameters.yaml#/PerPageParam'
+    IdParam:
+      $ref: './components/parameters.yaml#/IdParam'
+
+  responses:
+    BadRequest:
+      $ref: './components/responses.yaml#/BadRequest'
+    Unauthorized:
+      $ref: './components/responses.yaml#/Unauthorized'
+    NotFound:
+      $ref: './components/responses.yaml#/NotFound'
+    Forbidden:
+      $ref: './components/responses.yaml#/Forbidden'
+    Conflict:
+      $ref: './components/responses.yaml#/Conflict'
+    InternalServerError:
+      $ref: './components/responses.yaml#/InternalServerError'
+
+  schemas:
+    Error:
+      $ref: './schemas/common.yaml#/Error'
+    Meta:
+      $ref: './schemas/common.yaml#/Meta'
+    PaginationParams:
+      $ref: './schemas/common.yaml#/PaginationParams'
+
+    # Auth
+    RegisterRequest:
+      $ref: './schemas/auth.yaml#/RegisterRequest'
+    LoginRequest:
+      $ref: './schemas/auth.yaml#/LoginRequest'
+    AuthResponse:
+      $ref: './schemas/auth.yaml#/AuthResponse'
+    UserData:
+      $ref: './schemas/auth.yaml#/UserData'
+    MeResponse:
+      $ref: './schemas/auth.yaml#/MeResponse'
+
+    # User
+    User:
+      $ref: './schemas/user.yaml#/User'
+    CreateUserRequest:
+      $ref: './schemas/user.yaml#/CreateUserRequest'
+    UpdateUserRequest:
+      $ref: './schemas/user.yaml#/UpdateUserRequest'
+
+    # Product
+    Product:
+      $ref: './schemas/product.yaml#/Product'
+    CreateProductRequest:
+      $ref: './schemas/product.yaml#/CreateProductRequest'
+
+  securitySchemes:
+    BearerAuth:
+      $ref: './components/security.yaml#/BearerAuth'
+    ApiKeyAuth:
+      $ref: './components/security.yaml#/ApiKeyAuth'

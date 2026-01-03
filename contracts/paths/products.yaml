@@ -1,0 +1,134 @@
+products:
+  get:
+    operationId: listProducts
+    summary: Get all products
+    description: Retrieve a paginated list of products
+    tags:
+      - products
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: '../components/parameters.yaml#/PageParam'
+      - $ref: '../components/parameters.yaml#/PerPageParam'
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../schemas/product.yaml#/Product'
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '400':
+        $ref: '../components/responses.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  post:
+    operationId: createProduct
+    summary: Create new product
+    description: Create a new product
+    tags:
+      - products
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/product.yaml#/CreateProductRequest'
+    responses:
+      '201':
+        description: Product created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/product.yaml#/Product'
+      '400':
+        $ref: '../components/responses.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+
+products_by_id:
+  get:
+    operationId: getProduct
+    summary: Get product by ID
+    description: Retrieve a specific product by UUID
+    tags:
+      - products
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/product.yaml#/Product'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  put:
+    operationId: updateProduct
+    summary: Update product
+    description: Update an existing product
+    tags:
+      - products
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/product.yaml#/CreateProductRequest'
+    responses:
+      '200':
+        description: Product updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/product.yaml#/Product'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  delete:
+    operationId: deleteProduct
+    summary: Delete product
+    description: Delete a product
+    tags:
+      - products
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    responses:
+      '204':
+        description: Product deleted
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'

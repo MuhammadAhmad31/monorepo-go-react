@@ -1,0 +1,88 @@
+User:
+  type: object
+  required:
+    - id
+    - name
+    - email
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+      description: User UUID
+    name:
+      type: string
+      example: "John Doe"
+      minLength: 2
+      maxLength: 100
+      description: User's full name
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+      description: User's email address
+    role:
+      type: string
+      enum: [admin, user, guest]
+      default: user
+      description: User role
+    is_active:
+      type: boolean
+      default: true
+      description: Whether the user is active
+    created_at:
+      type: string
+      format: date-time
+      description: User creation timestamp
+    updated_at:
+      type: string
+      format: date-time
+      description: User last update timestamp
+
+CreateUserRequest:
+  type: object
+  required:
+    - name
+    - email
+    - password
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: "John Doe"
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+    password:
+      type: string
+      format: password
+      minLength: 6
+      example: "password123"
+      description: User password (will be hashed)
+    role:
+      type: string
+      enum: [admin, user, guest]
+      default: user
+
+UpdateUserRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+      minLength: 6
+      description: New password (optional, will be hashed)
+    role:
+      type: string
+      enum: [admin, user, guest]
+    is_active:
+      type: boolean

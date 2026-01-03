@@ -1,0 +1,134 @@
+users:
+  get:
+    operationId: listUsers
+    summary: Get all users
+    description: Retrieve a paginated list of users
+    tags:
+      - users
+    security:
+      - BearerAuth: [admin]
+    parameters:
+      - $ref: '../components/parameters.yaml#/PageParam'
+      - $ref: '../components/parameters.yaml#/PerPageParam'
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../schemas/user.yaml#/User'
+                meta:
+                  $ref: '../schemas/common.yaml#/Meta'
+      '400':
+        $ref: '../components/responses.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  post:
+    operationId: createUser
+    summary: Create new user
+    description: Create a new user (admin only)
+    tags:
+      - users
+    security:
+      - BearerAuth: [admin]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/user.yaml#/CreateUserRequest'
+    responses:
+      '201':
+        description: User created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/user.yaml#/User'
+      '400':
+        $ref: '../components/responses.yaml#/BadRequest'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+
+users_by_id:
+  get:
+    operationId: getUser
+    summary: Get user by ID
+    description: Retrieve a specific user by UUID
+    tags:
+      - users
+    security:
+      - BearerAuth: [admin]
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/user.yaml#/User'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  put:
+    operationId: updateUser
+    summary: Update user
+    description: Update an existing user
+    tags:
+      - users
+    security:
+      - BearerAuth: [admin]
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/user.yaml#/UpdateUserRequest'
+    responses:
+      '200':
+        description: User updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '../schemas/user.yaml#/User'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+  
+  delete:
+    operationId: deleteUser
+    summary: Delete user
+    description: Delete a user
+    tags:
+      - users
+    security:
+      - BearerAuth: [admin]
+    parameters:
+      - $ref: '../components/parameters.yaml#/IdParam'
+    responses:
+      '204':
+        description: User deleted
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
