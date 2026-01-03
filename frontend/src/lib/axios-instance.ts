@@ -1,7 +1,8 @@
+import { ENV } from '@/constants/env';
 import Axios, { type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: `${ENV.BASE_URL}/v1`,
 });
 
 AXIOS_INSTANCE.interceptors.request.use(
