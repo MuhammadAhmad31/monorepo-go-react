@@ -21,6 +21,7 @@ export const useAuth = () => {
         sessionStorage.setItem("authToken", data.token);
         toast.success("Login successful!");
         queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
+        navigate({ to: "/dashboard" });
       },
       onError: (error, _, context) => {
         if (context?.toastId) toast.dismiss(context.toastId);

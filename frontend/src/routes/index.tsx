@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { loginSchema } from "@/schemas/auth.schema";
 import { zodValidator } from "@/lib/zodFormValidator";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthMiddleware } from "@/middleware/auth.middleware";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: AuthMiddleware,
   component: RouteComponent,
 });
 
